@@ -1,0 +1,81 @@
+/*
+ * ProtoBLE - Protobuf RPC over Bluetooth Low Energy
+ * Copyright (c) 2018. Geoffrey Matrangola, electrazoom.com
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, version 3 of the License.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
+ *     This program is also available under a commercial license. If you wish
+ *     to redistribute this library and derivative work for commercial purposes
+ *     please see ProtoBLE.com to obtain a proprietary license that will fit
+ *     your needs.
+ */
+
+syntax = "proto3";
+
+import "BleExtensions.proto";
+
+// These will make the generated code a lot more clean. You'll use your domain, though.
+option java_package = "com.electrazoom.protoble.example";
+option java_outer_classname = "Hello";
+
+// This will prevent the javac from generating TCP/IP RPC code. Not sure if you can generate
+// both ProtoBLE and TCP/IP RPC.
+option java_generic_services = false;
+option cc_generic_services = false;
+
+// An example message for he Introduction coming from the BLE Central, used as the param
+message Introduction {
+    string name = 1;
+    string salutation = 2;
+}
+
+// An example message that is returned by the Peripherial
+message Greeting {
+    int64 timesttamp = 1;
+    string greeting = 2;
+}
+
+// Another example of parameter from the BLE Central
+message TimeRequest {
+    string format = 1;
+}
+
+// Another Return from the Perpherial
+message TimeResponse {
+    string formattedTime = 1;
+}
+
+// Use codegen to turn the generate code for Linux Paripherial and Android Central sides
+service HelloWorld {
+    // The name of the service in the Linux Network Manager running on the Linux Box (RPI or whatever)
+    option (app_path) = "/HelloWorld";
+    // UUID of the service running on the Peripherial
+    option (uuid) = "b481e98f-ecc2-46cc-a91b-bf32ebd35b06";
+
+    // RPC interface that accepts an Interoduction message and the sends a Greeting Message in
+    // response. The input (parameter) is specified by the parameter_uuid on the perpherial and can
+    // be set by the central. The peripheral then sets updates the return characteristic
+    // specified by the return_uuid. The central is notified because it enabled notifications for
+    // that characteristic and reads the output characteristic.
+    rpc helloWorld (Introduction) returns (Greeting) {
+        option (parameter_uuid) = "3d9e21c9-c15b-4f56-be8b-e3cb9a885ff5";
+        option (return_uuid) = "e9962334-d9b8-4b8c-8f55-405f0fa4da0d";
+    };
+
+    // RPC interface that accepts an TimeRequest message and the sends a TimeResponse Message in
+    // response.
+    rpc getTime (TimeRequest) returns (TimeResponse) {
+        option (parameter_uuid) = "fded380a-171a-4a6c-9b19-74fe311e3b3d";
+        option (return_uuid) = "bfc78fb4-6e92-4a36-bb2d-22dfd658d254";
+    };
+}

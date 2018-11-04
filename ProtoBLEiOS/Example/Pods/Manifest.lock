@@ -1,0 +1,19 @@
+PODS:
+  - ProtoBLEiOS (0.1.0)
+  - SwiftProtobuf (1.0.3)
+
+DEPENDENCIES:
+  - ProtoBLEiOS (from `../`)
+  - SwiftProtobuf (~> 1.0)
+
+EXTERNAL SOURCES:
+  ProtoBLEiOS:
+    :path: ../
+
+SPEC CHECKSUMS:
+  ProtoBLEiOS: e239ca95b85a5a48fb517ae72861bd26522daca5
+  SwiftProtobuf: 5ccc0e4054e37c75800e5744acb2aa80bb72b39c
+
+PODFILE CHECKSUM: 1fa9f68b56eb4a6099ae7c06174f0b53b2656f4f
+
+COCOAPODS: 1.4.0

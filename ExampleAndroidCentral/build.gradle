@@ -1,0 +1,128 @@
+/*
+ * ProtoBLE - Protobuf RPC over Bluetooth Low Energy
+ * Copyright (c) 2018. Geoffrey Matrangola, electrazoom.com
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, version 3 of the License.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
+ *     This program is also available under a commercial license. If you wish
+ *     to redistribute this library and derivative work for commercial purposes
+ *     please see ProtoBLE.com to obtain a proprietary license that will fit
+ *     your needs.
+ */
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.6'
+    }
+}
+
+apply plugin: 'com.google.protobuf'
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'idea'
+
+repositories {
+    maven { url "https://dl.bintray.com/babedev/maven" }
+    mavenLocal()
+    mavenCentral()
+}
+
+project(':ExampleAndroidCentral') {
+    assemble.dependsOn(':CodeGen:installDist')
+}
+
+protobuf {
+    protoc {
+        // This doesn't work on Raspberry Pi because there is no protoc compiled for arm in mavencentral.
+        artifact = 'com.google.protobuf:protoc:3.5.1-1'
+        // may need to specify path if protoc isn't in the usual place.
+        // path = '/usr/wherever'
+    }
+    plugins {
+        protoble {
+//            path = "${System.properties['user.home']}/Tools/codegen-1.0-SNAPSHOT/bin/AndroidClientPlugin"
+             path = "${project(':CodeGen').projectDir}/build/install/CodeGen/bin/AndroidClientPlugin"
+        }
+    }
+
+    generateProtoTasks {
+        all().each { task ->
+            task.plugins {
+                protoble {}
+            }
+            task.builtins {
+                remove java // common java classes already built in the :example-api-hello
+            }
+        }
+    }
+}
+
+android {
+    sourceSets {
+        // todo figour out how to put these files into a jar built by the api project
+        main.proto.srcDirs += "${project(':ExampleApiHello').projectDir}/src/main/proto"
+    }
+
+    compileSdkVersion 27
+
+    defaultConfig {
+        applicationId "com.electrazoom.protoble.mobile"
+        minSdkVersion 21
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+
+idea {
+    module {
+        sourceDirs += file("${buildDir}/generated/source/proto/main/java")
+    }
+}
+
+dependencies {
+    implementation project(':ExampleApiHello')
+    implementation project(':LibProtoBLEAndroid')
+    implementation project(':CodeGen')
+
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+//    implementation 'com.github.tony19:logback-android:1.1.1-11'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.android.support:appcompat-v7:$support_version"
+    implementation "com.android.support:design:$support_version"
+    implementation "com.android.support:recyclerview-v7:$support_version"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+
+    implementation 'com.github.florent37:runtime-permission-kotlin:1.0.1'
+    implementation 'com.google.guava:guava:24.0-android'
+}

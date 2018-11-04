@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ ProtoBLE - Protobuf RPC over Bluetooth Low Energy
+  ~ Copyright (c) 2018. Geoffrey Matrangola, electrazoom.com
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, version 3 of the License.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <https://www.gnu.org/licenses/>
+  ~
+  ~     This program is also available under a commercial license. If you wish
+  ~     to redistribute this library and derivative work for commercial purposes
+  ~     please see ProtoBLE.com to obtain a proprietary license that will fit
+  ~     your needs.
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.electrazoom.protoble.mobile">
+
+    <!-- ble -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="com.electrazoom.protoble.mobile.SelectPeripheralActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.electrazoom.protoble.mobile.HelloActivity" />
+        <activity android:name="com.electrazoom.protoble.mobile.EchoActivity"></activity>
+
+        <service android:name="com.electrazoom.protoble.example.HelloWorldBleCentralService" />
+        <service android:name="com.electrazoom.protoble.mobile.EchoBleCentralService" />
+    </application>
+
+</manifest>

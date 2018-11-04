@@ -1,0 +1,71 @@
+/*
+ * ProtoBLE - Protobuf RPC over Bluetooth Low Energy
+ * Copyright (c) 2018. Geoffrey Matrangola, electrazoom.com
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, version 3 of the License.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
+ *     This program is also available under a commercial license. If you wish
+ *     to redistribute this library and derivative work for commercial purposes
+ *     please see ProtoBLE.com to obtain a proprietary license that will fit
+ *     your needs.
+ */
+
+/**
+ * This build script generates the Java Code shared by the BLE Central and Peripheral
+ * <b>Note:</b> You have to run ./gradlew :CodeGen:installDist first
+ */
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.6'
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: 'com.google.protobuf'
+apply plugin: 'idea'
+
+ protobuf {
+    protoc {
+        // This doesn't work on Raspberry Pi because there is no protoc compiled for arm in mavencentral.
+        artifact = 'com.google.protobuf:protoc:3.5.1-1'
+        // may need to specify path if protoc isn't in the usual place.
+        // path = '/usr/wherever'
+    }
+     plugins {
+         common {
+             path = "${rootDir}/CodeGen/build/install/CodeGen/bin/CodeGen"
+         }
+     }
+
+     generateProtoTasks {
+         all().each { task ->
+             task.plugins {
+                 common {}
+             }
+         }
+     }
+ }
+
+idea {
+    module {
+        sourceDirs += file("${buildDir}/generated/source/proto/main/java")
+    }
+}
+
+dependencies {
+    api group: 'com.google.protobuf', name: 'protobuf-java', version: '3.5.1'
+    implementation project(':CodeGen')
+}

@@ -1,0 +1,43 @@
+/*
+ * ProtoBLE - Protobuf RPC over Bluetooth Low Energy
+ * Copyright (c) 2018. Geoffrey Matrangola, electrazoom.com
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, version 3 of the License.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
+ *     This program is also available under a commercial license. If you wish
+ *     to redistribute this library and derivative work for commercial purposes
+ *     please see ProtoBLE.com to obtain a proprietary license that will fit
+ *     your needs.
+ */
+
+syntax = "proto2";
+
+import "google/protobuf/descriptor.proto";
+
+//package com.electrazoom.protoble;
+option java_package = "com.electrazoom.protoble";
+
+extend google.protobuf.ServiceOptions {
+    // server side options
+    // D-Bus name
+    optional string app_path = 50101;
+    // Shared between server and client (Pariferial and Central)
+    // BLE Service UUID
+    optional string uuid = 50102;
+}
+
+extend google.protobuf.MethodOptions {
+    // Shared between server and client
+    optional string parameter_uuid = 50103;
+    optional string return_uuid = 50104;
+}

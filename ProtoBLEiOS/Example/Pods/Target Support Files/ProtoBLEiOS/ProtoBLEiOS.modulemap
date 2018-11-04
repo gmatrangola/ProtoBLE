@@ -1,0 +1,6 @@
+framework module ProtoBLEiOS {
+  umbrella header "ProtoBLEiOS-umbrella.h"
+
+  export *
+  module * { export * }
+}
