@@ -20,11 +20,9 @@ This repo provides libraries, Protobuf language extensions and a
 protoc plugins to generate code for each of the target platforms.
 
 ## NEW!
-This is an early release of the code. Knida pre-beta. If you are brave,
-go for it. This library is currently
-used for a project that is still under development.
-ProtoBLE will move out of beta after that project gets fielded or
-there is a significant purchase of the commercial licnese.
+This library is was developed for a project that is still under development.
+ProtoBLE will move out of beta after that project gets fielded or when
+there is a significant purchase of the commercial license.
 
 ## Setup
 
