@@ -5,14 +5,13 @@ running Android or iOS and Raspberry Pi (or similar Linux OS)
 ## Description
 This is a BLE Messaging system implemented using 
 [Google Protcol Buffers (a.k.a. Protobuf)](https://developers.google.com/protocol-buffers/).
-This implementation uses the Android Bluetooth BLE API as on the Central
-or iOS CoreBluetooth (client) side and the Linux BlueZ API on the
-Peripheral (server) side.
+Android Bluetooth BLE API or iOS CoreBluetooth as the BLE Central
+(client) and Linux BlueZ API as the Peripheral (server).
 
-Use of ProtoBLE abstracts a lot of the details for BLE protocol to make
+ProtoBLE abstracts a lot of the details for BLE protocol to make
 it easer to define custom services and enforces a well
-documnted cross-platform message definition using Protobufs. It also
-effectively increases the 20 byte transfer limit to 65534 bytes. Note
+documented cross-platform message definition using Protobuf .proto files.
+It also effectively increases the 20 byte transfer limit to 65534 bytes. Note
 that there are some practial limits on the message sizes and care
 should be taken to ensure that the messages don't exceed 65534 bytes or
 are too big for the low data bandwidth.
@@ -20,11 +19,10 @@ are too big for the low data bandwidth.
 This repo provides libraries, Protobuf language extensions and a
 protoc plugins to generate code for each of the target platforms.
 
-## Early Release!
+## NEW!
 This is an early release of the code. Knida pre-beta. If you are brave,
-go for it. Just remember the licensing limitatins and that we don't
-warranty or imply sutibility for any purpose. This library is currently
-used for a project that is still under development and not in the field.
+go for it. This library is currently
+used for a project that is still under development.
 ProtoBLE will move out of beta after that project gets fielded or
 there is a significant purchase of the commercial licnese.
 
@@ -81,7 +79,7 @@ tar -xvf CodeGen/build/distributions/CodeGen-1.0-SNAPSHOT.tar -C $HOME/tools/
 
 6. Make sure you have BlueZ set up for BLE Advertising: See: https://github.com/gmatrangola/ble-java#bluez-compatibility
 
-Note: You may be able to configure your Bluetooth device permissions so that the app doesn't have to be run as root. If you figure that out, please let me know. :)
+Note: You may want to configure your Bluetooth device permissions so that the Peripheral Application doesn't have to be run as root.
 
 ### Android BLE Central
 
@@ -98,14 +96,14 @@ git clone git@github.com:gmatrangola/ProtoBLE.git
 cd ProtoBLE
 ```
 
-3. Install the **ProtoBLE Code Generator** local repo and binary (if you haven't already)
+3. Install the **ProtoBLE Code Generator** local repo and binary
 ```
 ./gradlew :CodeGen:install :CodeGen:distTar
 mkdir $HOME/tools
 tar -xvf CodeGen/build/distributions/CodeGen-1.0-SNAPSHOT.tar -C $HOME/tools/
 ```
 
-2. Install LibProtoBLEAndroid into the local Maven Repository on the system where you run Android Studio
+4. Install LibProtoBLEAndroid into the local Maven Repository on the system where you run Android Studio
 ```
 ./gradlew :LibProtoBLEAndroid:install
 ```
@@ -122,10 +120,8 @@ overview.
 
 ## Usage
 
-Create a messaging API for sending and receiving data using Proto3, make UUIDs for the
- service, and each message. For the Peripheral, create a Plain Old Java project with an instance of 
- ```ProtoBleServer```, ```MessageInputBleCharacteristic```, and ```MessageOutputBleCharacteristic```.
- Then create a central on Android by creating a class that extends ```ProtoBleCentralService```
+Define a Protobuf service for sending and receiving data using Proto3,
+make UUIDs for the service, and each rpc.
   
 Take a look at *ExampleApiHello*, *ExampleAndroidCentral*, *ProtoBLEiOS*, and *ExampleLinuxServer*.
 
@@ -140,9 +136,8 @@ codegen scripts were installed.
 ### api.proto:
 
 It might be convenient to create a simple Java Library Module for the API that includes the proto 
-along with some interfaces containing constants for the UUIDs for use in both the Peripheral and 
-Central code. See ExampeApiHello. Use the com.google.protobuf to make this a seamless part of the
-build process 
+for the Peripheral and Central code. See ExampeApiHello. Use the
+protobuf gradle plugin to make this a seamless part of the build process.
  
 
 ```proto
@@ -155,70 +150,159 @@ message Greeting {
     int64 timesttamp = 1;
     string greeting = 2;
 }
+
+// Use codegen to turn the generate code for Linux Paripherial and Android Central sides
+service HelloWorld {
+    // The name of the service in the Linux Network Manager running on the Linux Box (RPI or whatever)
+    option (app_path) = "/HelloWorld";
+    // UUID of the service running on the Peripherial
+    option (uuid) = "b481e98f-ecc2-46cc-a91b-bf32ebd35b06";
+
+    // RPC interface that accepts an Interoduction message and the sends a Greeting Message in
+    // response. The input (parameter) is specified by the parameter_uuid on the perpherial and can
+    // be set by the central. The peripheral then sets updates the return characteristic
+    // specified by the return_uuid. The central is notified because it enabled notifications for
+    // that characteristic and reads the output characteristic.
+    rpc helloWorld (Introduction) returns (Greeting) {
+        option (parameter_uuid) = "3d9e21c9-c15b-4f56-be8b-e3cb9a885ff5";
+        option (return_uuid) = "e9962334-d9b8-4b8c-8f55-405f0fa4da0d";
+    };
+}
 ```
+
+1. Declare the messages accepted and returned from the RPC methods.
+1. Declare Protobuf service.
+1. Add app_path, uuid for the service.
+1. Add your RPC Methods.
+1. Assign a unique UUID for the param sending the meassage, and another for the return.
+
+The app_path is used in the Linux Network Manager. The UUID on the
+Protobuf service is the UUID for the BLE service. The UUID for the
+parameter and return are each assigned to a characteristic on the BLE service.
 
 **see:** ExampleApiHello
 
 ### BLE peripheral (Server-side)
 
-The Peripheral code is intended to run on Linux with the Oracle Java 8 JDK and BlueZ 5.46 installed.
-  A Raspberry Pi 3 or W running Raspbian Stretch should do fine. Create or enhance a Java 8 project 
-      with lib-proto-ble-linux, and the api library you cretaed above by adding them to the 
-      dependencies section of your Gradle file.
+The Peripheral code is intended to run on Linux with the Java 8 JDK and BlueZ 5.46 installed.
+A Raspberry Pi 3 or W running Raspbian Stretch should do fine. Create or enhance a Java 8 project
+with LibPotoBLELinux, and the api library you cretaed above by adding them to the
+dependencies section of your Gradle file.
         
 1. Install my fork of java-ble and LibProtoBleLinux (see above), and make sure you have mavenLocal in the
      '''repositories''' section of your server's build.gradle file. see setup above.
-     
-2. Add the '''dependencies''' to your build.gradle file. 
+2. Add the protobuf gradle plugin to your build.gradle
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.6'
+    }
+}
+apply plugin: 'com.google.protobuf'
+```
+3. Declare the protoc, plugins, and path
 
 ```groovy
+protobuf {
+    protoc {
+        // This doesn't work on Raspberry Pi because there is no protoc compiled for arm in mavencentral.
+        artifact = 'com.google.protobuf:protoc:3.5.1-1'
+        // may need to specify path if protoc isn't in the usual place.
+        // path = '/usr/wherever'
+    }
+    plugins {
+        server {
+            path = "${project(':CodeGen').projectDir}/build/install/CodeGen/bin/LinuxServerPlugin"
+        }
+    }
+
+    generateProtoTasks {
+        all().each { task ->
+            task.plugins {
+                server {}
+            }
+            task.builtins {
+                remove java // common java classes already built in the :example-api-hello
+            }
+        }
+    }
+}
+sourceSets {
+    main {
+        proto {
+            srcDir "${project(':YourApiProject').projectDir}/src/main/proto"
+        }
+    }
+}
+```
+
+4. Add the '''dependencies''' to your build.gradle file.
+
+
+```groovy
+
 dependencies {
     implementation group: electrazoom name: 'LibPotoBLELinux', version: '1.0'
-    implementation project(':your-java-lib-with-proto-file')
+    implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '3.5.1'
+    implementation 'com.electrazoom:CodeGen:1.0'
+    implementation project(':YourApiProject')
 }
 
 ```
 
-3. Create a Java Class with the ProtoBleServer, Input and Output Characteristics.
+5. Create a Java Class that implements the generated interface *YourServiceName*Rpc.
 
 ```java
-protoServer = new ProtoBleServer(APP_PATH, SERVICE_GUID);
-introductionMessageCharacteristic = new MessageInputBleCharacteristic("intro",
-        INTRO_INPUT_CHARACTERISTIC_GUID);
-greetingMessageCharacteristic = new MessageOutputBleCharacteristic("hello",
-        GREETING_OUTPUT_CHARACTERISTIC_GUID);
-
-introductionMessageCharacteristic.setInputListener(new MessageInputBleCharacteristic.InputListener() {
-    @Override
-    public void onServiceConnected() {
-        LOG.info("ServiceConnected");
-    }
-
-    @Override
-    public void onError(String error) {
-        LOG.error("Error on input characteristic " + error);
-    }
-
-    @Override
-    public void onMessageInput(byte[] message) {
-        LOG.debug("onMessageInput " + message.length);
-        try {
-            Hello.Introduction introduction = Hello.Introduction.parseFrom(message);
-            Hello.Greeting.Builder greeting = Hello.Greeting.newBuilder();
-            greeting.setTimesttamp(System.currentTimeMillis());
-            greeting.setGreeting("hey, " + introduction.getSalutation() + ", " +
-                    introduction.getName());
-            greetingMessageCharacteristic.sendMessage(greeting.build().toByteArray());
-        } catch (InvalidProtocolBufferException e) {
-            LOG.error("Error converting message", e);
-        }
-    }
-});
-protoServer.addMessageCharacteristic(greetingMessageCharacteristic);
-protoServer.addMessageCharacteristic(introductionMessageCharacteristic);
+public class HelloServer implements HelloWorldRpc {
+    private static final Logger LOG = LoggerFactory.getLogger(HelloServer.class);
 ```
 
-**see:** example-linux-server
+6. Override the methods that receive the calls (writes to the characteristics) from the central.
+Do something, then build and return the result message.
+
+```java
+    @Override
+    public Hello.Greeting helloWorld(Hello.Introduction in) {
+        Hello.Greeting.Builder greeting = Hello.Greeting.newBuilder();
+        greeting.setTimesttamp(System.currentTimeMillis());
+        greeting.setGreeting("hey, " + in.getSalutation() + ", " +
+                in.getName());
+        return greeting.build();
+    }
+```
+
+7. Override the connection and error handlers.
+
+```java
+    @Override
+    public void onConnect(String characteristic) {
+        LOG.info("Connected to {}", characteristic);
+    }
+
+    @Override
+    public void onError(String source, String message) {
+        LOG.error("Error {} with {}", message, source);
+    }
+
+```
+
+8. Write code to create and start your server.
+
+```java
+    private void start() throws DBusException, InterruptedException {
+        HelloWorldRpcServer serviceRpc = new HelloWorldRpcServer(this);
+        serviceRpc.startService();
+    }
+
+    public static void mainOrSomthingWhenYouAreReadyToPublishYourBLEService() {
+        HelloServer server = new HelloServer();
+        server.start();
+    }
+```
+**see:** ExampleLinuxServer
 
 ### iOS BLE Central (Client Side)
 
@@ -229,7 +313,7 @@ protoServer.addMessageCharacteristic(introductionMessageCharacteristic);
 
 protoc --proto_path=../../../CodeGen/src/main/proto/ --proto_path=../../../ExampleApiHello/src/main/proto --plugin=protoc-gen-protoble=../../../codegen/build/install/CodeGen/bin/SwiftClientPlugin --swift_out=Generated --protoble_out=Generated hello.proto
 ```
-1. Run the script and import the resulting swift files into your project.
+3. Run the script and import the resulting swift files into your project.
 1. The example uses one View Controller to select the BLE Peripheral and
 aonther to intract with ProtoBLE. There are other ways to this this.
 But the main point is to connect the ProtoBleCentralManager to the device
@@ -250,7 +334,7 @@ that advertises the desired service
         }
     }
 ```
-1. Implement the Delegate genrated for your service to handle asynchronyous callbacks.
+4. Implement the Delegate genrated for your service to handle asynchronyous callbacks.
 ```swift
 class HelloViewController: UIViewController, HelloWorldDelegate {
 //...
@@ -291,7 +375,7 @@ class HelloViewController: UIViewController, HelloWorldDelegate {
     }
 }
 ```
-10. Call the service methods using the genrated class.
+5. Call the service methods using the genrated class.
 ```swift
  @IBAction func onWriteButton(_ sender: Any) {
         let intro = Introduction.with {
@@ -471,6 +555,7 @@ dependencies {
 **see:** ExampleAndroidClient
 
 ## How to Compile and Install examples
+Follow the setup instructions for setting up the ProtoBLE Library.
 Buid with included Gradle wrapper and/or this project can be Opened in Android Studio.
 
 ### Andorid Central Code
@@ -536,5 +621,5 @@ See:
 This Project has an easy to use Dual License setup. Feel free to use
 the GPL License here for prototyping, internal demos, and derivative
 GPL Projects. However, there is a very inexpensive Commercial License
-avaialble at http://electrazoom.com that you can use in your own money
+available at http://electrazoom.com that you can use in your own money
 making schemes.
