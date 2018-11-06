@@ -26,14 +26,20 @@ there is a significant purchase of the commercial license.
 
 ## Setup
 
+You'll need to clone this repo and follow the steps below on your Linux,
+and/or MacOS development environments before you can develop ProtoBLE
+projects or build the examples.
+Note: You should be able to build the Android stuff on Windows, but
+we haven't tried it.
+
 ### Linux (Peripheral) Server Side Dependencies:
 
-Here is what you need to develop a BLE Peripheral on Linux.
+Here is what you need to develop a BLE Peripheral on Linux using ProtoBLE.
 
 #### Overview Requirements for Raspberry Pi Raspbian (may work on other Debian Distros)
 
-1. My fork of ble-java (see above). Install dependencies mentioned in it's README.md file.
-2. Oracle JDK for Java 8 (or better)
+1. My fork of ble-java (see above). Install dependencies mentioned in it's [README.md](https://github.com/gmatrangola/ble-java) file.
+2. Java JDK 8 (or better)
 3. BlueZ 5.43 or better
 4. libunixsocket-java (apt-get install libsocket-java)
 5. d-bus Java library libdbus-java
