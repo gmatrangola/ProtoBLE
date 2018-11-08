@@ -1,9 +1,11 @@
 # ProtoBLE BETA
+
 Protobuf messages and asynchronyous RPC over BLE between Mobile Devices
 running Android or iOS and Raspberry Pi (or similar Linux OS)
 
 ## Description
-This is a BLE Messaging system implemented using 
+
+This is a BLE Messaging system implemented using
 [Google Protcol Buffers (a.k.a. Protobuf)](https://developers.google.com/protocol-buffers/).
 Android Bluetooth BLE API or iOS CoreBluetooth as the BLE Central
 (client) and Linux BlueZ API as the Peripheral (server).
@@ -20,6 +22,7 @@ This repo provides libraries, Protobuf language extensions and a
 protoc plugins to generate code for each of the target platforms.
 
 ## NEW!
+
 This library is was developed for a project that is still under development.
 ProtoBLE will move out of beta after that project gets fielded or when
 there is a significant purchase of the commercial license.
