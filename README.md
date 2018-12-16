@@ -108,6 +108,8 @@ cd ProtoBLE
 ./gradlew :CodeGen:install :CodeGen:distTar
 mkdir $HOME/tools
 tar -xvf CodeGen/build/distributions/CodeGen-1.0-SNAPSHOT.tar -C $HOME/tools/
+mkdir $HOME/Tools/CodeGen-1.0-SNAPSHOT/proto/
+cp CodeGen/build/resources/main/BleExtensions.proto $HOME/Tools/CodeGen-1.0-SNAPSHOT/proto/
 ```
 
 4. Install LibProtoBLEAndroid into the local Maven Repository on the system where you run Android Studio
@@ -129,7 +131,7 @@ overview.
 
 Define a Protobuf service for sending and receiving data using Proto3,
 make UUIDs for the service, and each rpc.
-  
+
 Take a look at *ExampleApiHello*, *ExampleAndroidCentral*, *ProtoBLEiOS*, and *ExampleLinuxServer*.
 
 For Java builds, take a look at the protobuf.plugins section of the build.gradle file in
@@ -139,13 +141,13 @@ For Swift builds, take a look at ProtoBLEiOS/Example/ProtoBLEiOS/GenerateProto.s
 
 For your projects, you'll replace the ```path``` property with the approprte full path to where the
 codegen scripts were installed. 
- 
+
 ### api.proto:
 
 It might be convenient to create a simple Java Library Module for the API that includes the proto 
 for the Peripheral and Central code. See ExampeApiHello. Use the
 protobuf gradle plugin to make this a seamless part of the build process.
- 
+
 
 ```proto
 message Introduction {
@@ -195,7 +197,7 @@ The Peripheral code is intended to run on Linux with the Java 8 JDK and BlueZ 5.
 A Raspberry Pi 3 or W running Raspbian Stretch should do fine. Create or enhance a Java 8 project
 with LibPotoBLELinux, and the api library you cretaed above by adding them to the
 dependencies section of your Gradle file.
-        
+​        
 1. Install my fork of java-ble and LibProtoBleLinux (see above), and make sure you have mavenLocal in the
      '''repositories''' section of your server's build.gradle file. see setup above.
 2. Add the protobuf gradle plugin to your build.gradle
@@ -578,11 +580,11 @@ the code generator and libs.
 Build and install to connected Android device
 
 `./gradlew installDebug`
- 
+
 or
- 
+
 `./gradlew installRelease`
- 
+
 
 ### Sample Linux Parpherial
 
