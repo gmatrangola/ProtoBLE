@@ -24,8 +24,8 @@ public class EchoBytesTestServer {
 
     private EchoBytesTestServer() {
         protoServer = new ProtoBleServer(APP_PATH, BULK_SERVICE_GUID);
-        inputCharacteristic = new MessageInputBleCharacteristic("bulkIn", BULK_INPUT_GUID);
-        outputCharacteristic = new MessageOutputBleCharacteristic("bulkOut", BULK_OUTPUT_GUID);
+        inputCharacteristic = new MessageInputBleCharacteristic(protoServer.getService(), "bulkIn", BULK_INPUT_GUID);
+        outputCharacteristic = new MessageOutputBleCharacteristic(protoServer.getService(), "bulkOut", BULK_OUTPUT_GUID);
 
         inputCharacteristic.setInputListener(new MessageInputBleCharacteristic.InputListener() {
             @Override

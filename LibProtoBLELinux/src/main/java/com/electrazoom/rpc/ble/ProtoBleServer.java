@@ -46,10 +46,13 @@ public class ProtoBleServer {
         service = new BleService(appPath + "/service", serviceGuid, true);
     }
 
+    public BleService getService() {
+        return service;
+    }
+
     public void addMessageCharacteristic(MessageBleCharacteristic characteristic) {
         characteristic.setConnectedDevices(connectedDevices);
         msgCharacteristics.put(characteristic.getName(), characteristic);
-        characteristic.setService(service);
         service.addCharacteristic(characteristic);
     }
 

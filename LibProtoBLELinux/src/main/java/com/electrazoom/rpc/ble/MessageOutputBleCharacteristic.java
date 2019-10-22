@@ -22,8 +22,8 @@ public class MessageOutputBleCharacteristic extends MessageBleCharacteristic imp
 
     private OutputMessageQueue outputQueue = new OutputMessageQueue();
 
-    public MessageOutputBleCharacteristic(String name, String charUuId) {
-        super(name);
+    public MessageOutputBleCharacteristic(BleService service, String name, String charUuId) {
+        super(service, name);
         this.uuid = charUuId;
         List<CharacteristicFlag> flags = new ArrayList<CharacteristicFlag>();
         flags.add(CharacteristicFlag.READ);
@@ -35,12 +35,6 @@ public class MessageOutputBleCharacteristic extends MessageBleCharacteristic imp
         LOG.debug("sendMessage " + Hex.encodeHexString(bytes));
         outputQueue.add(bytes);
         if (!getConnectedDevices().isEmpty()) sendNotification(null);
-    }
-
-    @Override
-    public void setService(BleService service) {
-        super.setService(service);
-        this.path = service.getPath() + "/" + name;
     }
 
     @Override

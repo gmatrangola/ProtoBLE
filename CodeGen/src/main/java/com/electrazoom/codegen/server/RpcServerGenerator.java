@@ -168,10 +168,10 @@ public class RpcServerGenerator extends JavaClassGenerator {
         String name = method.getName();
         FieldSpec param = paramCharacteristicFields.get(name);
         FieldSpec ret = returnCharacteristicFields.get(name);
-        constructor.addStatement("$N = new $T(\"rpc_" + name + "Param\"," + paramUuidName(name) +
+        constructor.addStatement("$N = new $T(protoBleServer.getService(), \"rpc_" + name + "Param\"," + paramUuidName(name) +
                 ")", param, param.type);
         constructor.addStatement("$N.setInputListener(new $N(rpc))", param, methodListenerInterfaceName(name));
-        constructor.addStatement("$N = new $T(\"rpc_" + name + "Return\"," + returnUuidName(name) +
+        constructor.addStatement("$N = new $T(protoBleServer.getService(), \"rpc_" + name + "Return\"," + returnUuidName(name) +
                 ")", ret, ret.type);
         constructor.addStatement("$N.addMessageCharacteristic($N)", bleServerField, param);
         constructor.addStatement("$N.addMessageCharacteristic($N)", bleServerField, ret);

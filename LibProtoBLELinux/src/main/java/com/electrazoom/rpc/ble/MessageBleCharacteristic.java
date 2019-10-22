@@ -3,6 +3,7 @@ package com.electrazoom.rpc.ble;
 import java.util.Map;
 
 import it.tangodev.ble.BleCharacteristic;
+import it.tangodev.ble.BleService;
 
 /**
  * Base Class for Protobuf Message BLE Characteristics
@@ -11,9 +12,10 @@ abstract class MessageBleCharacteristic extends BleCharacteristic {
     protected final String name;
     private Map<String, String> connectedDevices;
 
-    public MessageBleCharacteristic(String name) {
-        super();
+    public MessageBleCharacteristic(BleService service, String name) {
+        super(service);
         this.name = name;
+        this.path = service.getPath() + "/" + name;
     }
 
     public abstract void clear();

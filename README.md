@@ -61,6 +61,7 @@ If protoc is not available for your platform, you can download and install it fr
 ```
 git clone https://github.com/gmatrangola/ble-java
 cd ble-java
+git checkout develop
 ./gradlew install
 ```
 
@@ -590,6 +591,7 @@ or
 
 Build the Java applicaiton package
 
+'./gradlew :CodeGen:installDist`
 `./gradlew :ExampleLinuxServer:installDist`
 
 Run

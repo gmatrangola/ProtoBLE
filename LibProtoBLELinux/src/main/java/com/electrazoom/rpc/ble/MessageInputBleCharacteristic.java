@@ -33,8 +33,8 @@ public class MessageInputBleCharacteristic extends MessageBleCharacteristic impl
     private ByteBuffer currentBuffer;
     private InputListener inputListener;
 
-    public MessageInputBleCharacteristic(String name, String charUuid) {
-        super(name);
+    public MessageInputBleCharacteristic(BleService service, String name, String charUuid) {
+        super(service, name);
         this.uuid = charUuid;
         List<CharacteristicFlag> flags = new ArrayList<CharacteristicFlag>();
         flags.add(CharacteristicFlag.WRITE);

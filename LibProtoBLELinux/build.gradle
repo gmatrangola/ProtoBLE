@@ -32,13 +32,13 @@ repositories {
 }
 
 dependencies {
-    api 'it.tangodev:ble-java:0.5'
+    api 'it.tangodev:ble-java:0.6'
     api fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':LibValueMsg')
     implementation 'org.slf4j:slf4j-api:1.7.25'
-    testImplementation 'ch.qos.logback:logback-classic:1.1.7'
+    testImplementation 'ch.qos.logback:logback-classic:1.1.11'
     implementation 'commons-codec:commons-codec:1.11'
 }
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+//sourceCompatibility = "1.8"
+//targetCompatibility = "1.8"
